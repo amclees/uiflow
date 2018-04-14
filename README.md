@@ -1,213 +1,212 @@
 # uiflow
 
-マークダウン風のテキストからUI Flowsのグラフを生成するコンパイラ
+A compiler that creates UI flow graphs from markdown-style text.
 
-## UI Flowsとは？
+## What are UI Flows?
 
-Webサイトやスマホアプリなどのユーザーインタフェースを設計する際に、より簡単な表現で全体の流れを記述する次のような図のことです。
+When planning the user interfaces for things like websites or smartphone apps, a UI flow is a simple representation describing the entire flow of an application, like the one depicted below.
 
 ![simple.png](https://qiita-image-store.s3.amazonaws.com/0/35671/83a65590-8ea7-a124-0a86-ca9cb967402b.png "simple.png")
 
-具体的なUI設計に触れず、
+Without touching on a specific UI:
 
-* ユーザーが見るもの
-* ユーザーがする行動
+* Things the users see
+* Things the users do
 
-に注目することでシンプルにUIの必要条件、あるいは骨子を記述することができます。
+By observing these, we can simply describe the necessary conditions, and also the essentials, of a UI.
 
-``uiflow``コンパイラは、次のような簡潔な表現でこのような図を作図することができます。
+The ``uiflow`` compiler can construct concise representation diagrams like the following:
 
 ```markdown:sample.txt
-[最初に]
-ユーザーが見るものを書きます。
+[First]
+Write the things the user sees
 --
-ユーザーがする行動を書きます。
+Write the things the user does
 
-[次に]
-ユーザーが見るもの
+[Next]
+Thing the user sees
 --
-ユーザーがすること１
-==> その結果１
-ユーザーがすること２
-==> その結果２
+The first thing the user does
+==> The result from the first thing being done
+The second thing the user does
+==> The result from the second thing being done
 
-[その結果１]
-結果
+[The result from the first thing being done]
+Result
 
-[その結果２]
-結果
+[The result from the second thing being done]
+Result
 ```
 
-## インストール方法
+## Installation
 
-グラフの生成には[Graphviz](http://www.graphviz.org/)を用います。brewなどを通じてinstallしておいてください。
-
+Graphviz is utilized in the creation of graphs. Using something like brew, please kindly install it.
 
 ```
 brew install graphviz
 npm install -g uiflow
 ```
 
-## コマンドの使い方
+## Command Usage
 
-### シンプルな使い方
+### Simple Usage
 
 ```bash:
 uiflow -i myapp.txt -o myapp.png -f png  
 ```
 
-myapp.txtをpng形式で、myapp.pngに変換する。
+Convert myapp.txt to png format and save it.
 
-### svgで出力
+### Output as svg
 
 ```bash:
 uiflow -i myapp.txt -f svg
 ```
-myapp.txtをsvg形式で、標準出力に表示する。
 
-## uiflow形式の文法
+Output myapp.txt in svg form to standard output.
 
-### 基本ブロック
+## Grammar for the uiflow format
 
-```markdown:基本ブロック
-[ページ名]
-表示要素1
-表示要素2
-表示要素3
+### Basic Blocks
+
+```markdown:basic_blocks
+[Page Name]
+Display Element 1
+Display Element 2
 --
-行動要素1
-===> 遷移先ページ1名
-行動要素2
-===> 遷移先ページ2名
+Action Element 1
+===> Name of page after transition 1
+Action Element 2
+===> Name of page after transition 2
 ```
 
 
 ![base.png](https://qiita-image-store.s3.amazonaws.com/0/35671/f2b4855d-a53c-5414-50f1-de4f07bc2f16.png "base.png")
 
-### 基本ブロックをつなげる
+### Connecting Basic Blocks
 
 
-```markdown:基本ブロック
-[ページ名]
-表示要素1
+```markdown:basic_blocks
+[Page Name]
+Display Element 1
 --
-行動要素1
+Action Element 1
 
-[ページ名2]
-表示要素
+[Page Name 2]
+Display Element
 --
-行動要素
+Action Element
 
-[ページ名3]
-表示要素
+[Page Name 3]
+Display Element
 --
-行動要素
+Action Element
 ```
-行動要素の``==>``を省略すると次の基本ブロックに自動的につながります。
+By omitting action elements' ``==>``, they are automatically connected to the next basic block.
 
 ![base.png](https://qiita-image-store.s3.amazonaws.com/0/35671/01f02911-6738-549f-dd93-b829887843fb.png "base.png")
 
 
-### 遷移に名前をつける
-``=={hogehoge}=>``と表記して、遷移に名前をつけることができます。
+### Naming Transition
+By writing ``=={hogehoge}=>``, you can apply a name to the transition.
 
-```
-[最初に]
-ユーザーが見るものを書きます。
+```markdown:basic_blocks
+[First]
+Write something the user sees
 --
-ユーザーがする行動を書きます。
+Write something the user does
 
-[次に]
-ユーザーが見るもの
+[Next]
+Thing the user sees
 --
-ユーザーがすること１
-=={遷移アクション名}=> その結果１
-ユーザーがすること２
-=={API名など}=> その結果２
+Thing the user does 1
+=={Transition action name}=> Result 1
+Thing the user does 2
+=={Something like the name of an API}=> Result 2
 
-[その結果１]
-結果
+[Result 1]
+Result
 
-[その結果２]
-結果
+[Result 2]
+Result
 
 ```
 ![simple-graph.png](https://qiita-image-store.s3.amazonaws.com/0/35671/eff43bff-b436-c9e5-815e-559143cec750.png "simple-graph.png")
 
 
-### 少し複雑な例
+### A somewhat complicated example
 
 ```markdown:complex
 
-[初回通知]
-通知の確認ダイアログ
+[First Time Notification]
+The notification's confirmation dialog
 --
 OK
 
-[国選択]
-リージョンの選択
-デフォルトで日本
-OKボタン
+[Country Selection]
+Choices for a region
+Japanese as default
+OK button
 --
 OK
 
-[はじめよう]
-ヒント情報
-はじめるボタン
+[Let's Begin]
+Hint information
+Start button
 --
-ヒントをスワイプ
-==> はじめよう
-LINEQを始める
+Swipe the hint
+==> Let's Begin
+Start LINEQ
 
-[非ログインメイン画面]
-ログインすると全ての機能を使えますアラート
-フィード
-通知アイコン
-検索アイコン
-ホーム
-分野
-Qボタン
-ランキング
-マイページ(N)
+[Main non-logged in screen]
+Alert that you can use all features once logged in
+Feed
+Notification icon
+Search icon
+Home
+Categories
+Q button
+Ranking
+My Page (N)
 ------
-アラートをタップ
-==> 利用規約
-分野をタップ
-==> 分野
-Qボタンをタップ
-==> ログイン確認
-ランキングをタップ
-==> ランキング
+Tap the alert
+==> Terms of Use
+Tap categories
+==> Categories
+Tap the Q button
+==> Login screen
+Tap ranking
+==> Ranking
 
 
-[利用規約]
-利用規約の表示
+[Terms of Use]
+Display of Terms of Use
 
-[分野]
-分野詳細
+[Categories]
+Category details
 
-[ランキング]
-ランキング詳細
+[Ranking]
+Ranking details
 
 ```
 ![base.png](https://qiita-image-store.s3.amazonaws.com/0/35671/5f26cd34-39bf-4dd3-c2b9-2ac892abbdd8.png "base.png")
 
 
-## uiflowをライブラリとして使う
+## Using uiflow as a library
 
-次のように使うことができます。
+You can use it as follows:
 
-```javascript:sampleusage
+```javascript
 var uiflow = require("uiflow");
 
-// dot形式で書き出す
-var dot = uiflow.compile("[テスト]\nユーザーが見るもの\nユーザがすること\n");
+// Write out in dot form
+var dot = uiflow.compile("[Test]\nThing the user sees\nThing the user does\n");
 
-// パースされたAST表現をjsonで書き出す
-var json = uiflow.json("[テスト]\nユーザーが見るもの\nユーザがすること\n");
+// Write out a parsed AST representation as JSON
+var json = uiflow.json("[Test]\nThing the user sees\nThing the user does\n");
 
-// graphvizをつかって、svgに変換したものを標準出力に渡す。
-uiflow.build("ソースコード","svg")
+// Using graphviz, put an svg-converted version to standard output
+uiflow.build("Source code","svg")
 	.pipe(process.stdout);
 ```
 
@@ -215,7 +214,3 @@ uiflow.build("ソースコード","svg")
 
 * [画面遷移に疑問を感じたあなたにオススメするUI Flowsというツール](http://www.standardinc.jp/reflection/article/ui-flows/)
 * [A shorthand for designing UI flows](https://signalvnoise.com/posts/1926-a-shorthand-for-designing-ui-flows)
-
-
-
-
